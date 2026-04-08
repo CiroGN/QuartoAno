@@ -1,3 +1,5 @@
+from random import random
+
 from OpenGL.GL import * 
 from OpenGL.GLUT import * 
 from OpenGL.GLU import * 
@@ -12,18 +14,20 @@ ganhou = False
 def myInit(): 
     glClearColor(1.0, 1.0, 1.0, 1.0) 
     glPointSize(25.0) 
-    gluOrtho2D(0, 500, 0, 500) 
+    gluOrtho2D(0, 1000, 0, 1000) 
  
 def teclas_especiais(tecla, x, y): 
     global x_pos, y_pos, ganhou 
      
-    if ganhou: return  
+    tecla = tecla.lower()
+
+    if ganhou: return
+    if tecla == GLUT_KEY_UP or b'w':    y_pos += velocidade 
+    elif tecla == GLUT_KEY_DOWN or b's':  y_pos -= velocidade 
+    elif tecla == GLUT_KEY_LEFT or b'a':  x_pos -= velocidade 
+    elif tecla == GLUT_KEY_RIGHT or b'd': x_pos += velocidade 
  
-    if tecla == GLUT_KEY_UP:    y_pos += velocidade 
-    elif tecla == GLUT_KEY_DOWN:  y_pos -= velocidade 
-    elif tecla == GLUT_KEY_LEFT:  x_pos -= velocidade 
-    elif tecla == GLUT_KEY_RIGHT: x_pos += velocidade 
- 
+        
     # --- INÍCIO DA LÓGICA DE COLISÃO --- 
      
     # 1. Aplica o Teorema de Pitágoras: d = sqrt( (x2-x1)^2 + (y2-y1)^2 ) 
@@ -41,7 +45,7 @@ def teclas_especiais(tecla, x, y):
     glutPostRedisplay() 
  
 def display(): 
-    glClear(GL_COLOR_BUFFER_BIT) 
+    # glClear(GL_COLOR_BUFFER_BIT) 
      
     # Desenha o Objetivo (Vermelho) 
     glColor3f(1.0, 0.0, 0.0) 
@@ -53,7 +57,7 @@ def display():
     if ganhou: 
         glColor3f(0.0, 0.8, 0.0)  
     else: 
-        glColor3f(0.2, 0.4, 0.8) 
+        glColor3f(random(), random(), random()) # Cor aleatória para o jogador (opcional)
          
     glBegin(GL_POINTS) 
     glVertex2f(x_pos, y_pos) 
