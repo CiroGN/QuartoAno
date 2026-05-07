@@ -26,7 +26,7 @@ Com α = 4 o brilho cobre boa parte da esfera de forma suave e difusa. Conforme 
 O brilho especular deixa de ser uma propriedade da luz e passa a ser uma propriedade do material. Isso gera materiais fisicamente impossíveis — uma superfície que muda de cor dependendo do ângulo de visão, como iridescência ou hologramas.
 
 ## Atividade 6
-**Luz próxima**
+**Luz próxima**<br>
 ![Luz Próxima](image-2.png)<br>
 **Luz distante**<br>
 ![Luz distante](image-3.png)
