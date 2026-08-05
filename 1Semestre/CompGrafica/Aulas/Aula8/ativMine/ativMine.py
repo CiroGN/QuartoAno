@@ -4,10 +4,10 @@ from OpenGL.GL import *
 from OpenGL.GLU import *
 from PIL import Image
 import math
+import random
 
-
-# --- ESTADO GLOBAL DO JOGADOR E VEÃCULO ---
-pos_x, pos_y, pos_z = 0.0, 0.0, 0.0
+# --- ESTADO GLOBAL DO JOGADOR E VEÍCULO ---
+pos_x, pos_y, pos_z = 0.0, -1.65, 0.0
 velocidade = 0.06 
 ang_ombro = 0.0
 braco_levantado = False
@@ -31,25 +31,29 @@ v_pressionado = False
 p_pressionado = False
 c_pressionado = False
 e_pressionado = False
+# Entrar/Sair do carro
+q_pressionado = False
+# Interagir com portas
+f_pressionado = False
 
 # --- SISTEMA DE INVENTÁRIO E MUNDO ---
 player_angle = 0.0
-s_pressionado = False
-d_pressionado = False
-
-# --- SISTEMA DE INVENTÃRIO E MUNDO ---
-held_item = None  
-dropped_items = [] 
+held_item = None 
 car_built = False
+house_built = False
+house_placed = False
+house_door_open = False
+house_scale = 0.0
 is_driving = False
 car_x, car_z = -5.0, 0.0
+house_x, house_z, house_yaw = 0.0, 0.0, 0.0
 
 # AnimaÃ§Ãµes de Entidades
 animal_jump_timer = 0.0
 animal_y = -1.5
 
 # IDs dos Blocos
-PAREDE, PORTA_JANELA, TETO, PIRAMIDE_CARRO, CORPO_CARRO, RODA_TORUS = 0, 1, 2, 3, 4, 5
+PAREDE, PORTA_JANELA, TETO, PIRAMIDE_CARRO, CORPO_CARRO, RODA_TORUS, CASA = 0, 1, 2, 3, 4, 5, 6
 
 spawners = {
     PAREDE: (13.0, -1.5, -5.0),
@@ -59,6 +63,8 @@ spawners = {
     CORPO_CARRO: (13.0, -1.5, 3.0),
     RODA_TORUS: (13.0, -1.5, 5.0)
 }
+
+dropped_items = []
 
 # --- MATRIZ DE SOMBRA PROJETADA (LUZ DE POSTE / PONTO) ---
 def construir_matriz_sombra_poste(luz_pos, chao_y):
@@ -177,6 +183,45 @@ def desenhar_torus(R, r, tex_id):
         glEnd()
     glDisable(GL_TEXTURE_2D)
 
+def desenhar_estrutura_casa(tex_corpo, porta_aberta):
+    wall_h = 3.2
+    wall_th = 0.25
+    half_w = 2.8
+    half_d = 2.8
+    door_w = 1.4
+    lintel_h = 0.5
+    glPushMatrix()
+    glTranslatef(0, wall_h / 2, 0)
+
+    # Parede traseira
+    glPushMatrix(); glTranslatef(0, 0, -half_d + wall_th / 2); desenhar_bloco(half_w * 2, wall_h, wall_th, tex_corpo); glPopMatrix()
+    # Paredes laterais
+    glPushMatrix(); glTranslatef(-half_w + wall_th / 2, 0, 0); desenhar_bloco(wall_th, wall_h, half_d * 2, tex_corpo); glPopMatrix()
+    glPushMatrix(); glTranslatef(half_w - wall_th / 2, 0, 0); desenhar_bloco(wall_th, wall_h, half_d * 2, tex_corpo); glPopMatrix()
+
+    # Parede frontal com ou sem porta
+    if porta_aberta:
+        glPushMatrix(); glTranslatef(-half_w + 0.9, 0, half_d - wall_th / 2); desenhar_bloco(1.8, wall_h, wall_th, tex_corpo); glPopMatrix()
+        glPushMatrix(); glTranslatef(half_w - 0.9, 0, half_d - wall_th / 2); desenhar_bloco(1.8, wall_h, wall_th, tex_corpo); glPopMatrix()
+        glPushMatrix(); glTranslatef(0, wall_h / 2 - lintel_h / 2, half_d - wall_th / 2); desenhar_bloco(door_w + 0.4, lintel_h, wall_th, tex_corpo); glPopMatrix()
+    else:
+        glPushMatrix(); glTranslatef(0, 0, half_d - wall_th / 2); desenhar_bloco(half_w * 2, wall_h, wall_th, tex_corpo); glPopMatrix()
+
+    # Telhado piramidal
+    glPushMatrix(); glTranslatef(0, wall_h / 2 + 0.5, 0); desenhar_piramide(half_w * 2 + 0.5, 1.0, half_d * 2 + 0.5, tex_corpo); glPopMatrix()
+    glPopMatrix()
+
+
+def desenhar_casa_item(tex_corpo):
+    glPushMatrix()
+    glScalef(0.6, 0.6, 0.6)
+    glTranslatef(0, 1.0, 0)
+    desenhar_bloco(1.0, 1.0, 1.0, tex_corpo)
+    glTranslatef(0, 0.8, 0)
+    desenhar_piramide(1.2, 0.5, 1.2, tex_corpo)
+    glPopMatrix()
+
+
 def renderizar_peca(tipo, tex_corpo):
     if tipo == PAREDE:              desenhar_bloco(1.2, 1.0, 0.2, tex_corpo)
     elif tipo == PORTA_JANELA:      desenhar_bloco(0.6, 1.2, 0.2, tex_corpo)
@@ -186,6 +231,8 @@ def renderizar_peca(tipo, tex_corpo):
     elif tipo == RODA_TORUS:        
         glPushMatrix(); glRotatef(90, 0, 1, 0)
         desenhar_torus(0.4, 0.15, tex_corpo); glPopMatrix()
+    elif tipo == CASA:
+        desenhar_casa_item(tex_corpo)
 
 def desenhar_membro(lado, ang, tex_id, eh_perna=False):
     glPushMatrix()
@@ -225,22 +272,34 @@ def desenhar_geometria_carro(tex_corpo):
     glPopMatrix()
 
 def checar_fabrica():
-    global car_built, dropped_items
+    global car_built, dropped_items, house_built
     itens_fabrica = [i for i in dropped_items if i['x'] < -2.0 and abs(i['z']) < 4.0]
     tori = [i for i in itens_fabrica if i['type'] == RODA_TORUS]
     piramides = [i for i in itens_fabrica if i['type'] == PIRAMIDE_CARRO]
     retangulos = [i for i in itens_fabrica if i['type'] == CORPO_CARRO]
-    
+    paredes = [i for i in itens_fabrica if i['type'] == PAREDE]
+    portas = [i for i in itens_fabrica if i['type'] == PORTA_JANELA]
+    tetos = [i for i in itens_fabrica if i['type'] == TETO]
+
+    if not house_built and len(paredes) >= 4 and len(portas) >= 1 and len(tetos) >= 1:
+        for _ in range(4): dropped_items.remove(paredes[_])
+        dropped_items.remove(portas[0])
+        dropped_items.remove(tetos[0])
+        dropped_items.append({'type': CASA, 'x': -4.0, 'y': -1.95, 'z': 0.0})
+        house_built = True
+        print("Fábrica: casa construída como item!")
+
     if len(tori) >= 4 and len(piramides) >= 1 and len(retangulos) >= 1:
         for _ in range(4): dropped_items.remove(tori[_])
         dropped_items.remove(piramides[0])
         dropped_items.remove(retangulos[0])
         car_built = True
+        print("Fábrica: veículo construído com sucesso!")
 
 def main():
     global pos_x, pos_y, pos_z, ang_ombro, braco_levantado, tempo_caminhada, offset_lava, player_angle
-    global camera_primeira_pessoa, v_pressionado, p_pressionado, c_pressionado, e_pressionado
-    global held_item, dropped_items, car_built, is_driving, car_x, car_z, animal_jump_timer, animal_y
+    global camera_primeira_pessoa, v_pressionado, p_pressionado, c_pressionado, e_pressionado, q_pressionado, f_pressionado
+    global held_item, dropped_items, car_built, house_built, house_placed, house_door_open, house_scale, is_driving, car_x, car_z, house_x, house_z, house_yaw, animal_jump_timer, animal_y
 
     if not glfw.init(): return
     window = glfw.create_window(1000, 800, "Minecraft - RobÃ´ com sombra", None, None)
@@ -297,13 +356,53 @@ def main():
             move_z /= magnitude
             dx = move_x * velocidade
             dz = move_z * velocidade
-            if is_driving:
-                car_x += dx; car_z += dz
-                pos_x, pos_z = car_x, car_z
+
+            # Colisão simples com a árvore, o animal e a casa
+            def colisao_obstaculo(x, z):
+                # tronco + folhas da árvore
+                if math.hypot(x + 4.0, z - 6.0) < 1.0:
+                    return True
+                # animal que salta
+                if math.hypot(x + 3.0, z + 5.0) < 1.0:
+                    return True
+                # colisão da casa colocada
+                if house_placed and house_scale > 0.3:
+                    fx = math.cos(math.radians(house_yaw))
+                    fz = math.sin(math.radians(house_yaw))
+                    rx = -fz
+                    rz = fx
+                    rel_x = (x - house_x) * rx + (z - house_z) * rz
+                    rel_z = (x - house_x) * fx + (z - house_z) * fz
+                    half_w = 2.8 * house_scale
+                    half_d = 2.8 * house_scale
+                    wall_th = 0.25 * house_scale
+                    door_w = 1.4 * house_scale
+                    if abs(rel_x) > half_w or abs(rel_z) > half_d:
+                        return False
+                    if abs(rel_x) > half_w - wall_th:
+                        return True
+                    if rel_z < -half_d + wall_th:
+                        return True
+                    if rel_z > half_d - wall_th:
+                        if not house_door_open:
+                            return True
+                        if abs(rel_x) > door_w * 0.75:
+                            return True
+                    return False
+
+            next_x = car_x + dx if is_driving else pos_x + dx
+            next_z = car_z + dz if is_driving else pos_z + dz
+            if not colisao_obstaculo(next_x, next_z):
+                if is_driving:
+                    car_x = next_x; car_z = next_z
+                    pos_x, pos_z = car_x, car_z
+                else:
+                    pos_x = next_x; pos_z = next_z
+                movendo = True
+                player_angle = math.degrees(math.atan2(move_x, -move_z))
             else:
-                pos_x += dx; pos_z += dz
-            movendo = True
-            player_angle = math.degrees(math.atan2(move_x, -move_z))
+                # evita atravessar árvore ou animal
+                movendo = False
         else:
             if is_driving:
                 # mantém o carro com a posição do jogador enquanto estiver dirigindo
@@ -317,32 +416,69 @@ def main():
         if glfw.get_key(window, glfw.KEY_P) == glfw.PRESS and not p_pressionado:
             p_pressionado = True
             if held_item is None:
+                # Primeiro tente coletar nas estações infinitas (spawners)
                 for tipo, p_spawn in spawners.items():
                     if math.sqrt((pos_x - p_spawn[0])**2 + (pos_z - p_spawn[2])**2) < 2.0:
-                        held_item = tipo; break
+                        held_item = tipo
+                        print(f"Picked from spawner: {tipo}")
+                        break
+                # Caso não esteja próximo de um spawner, pegue itens soltos
                 if held_item is None:
-                    for item in dropped_items:
+                    for item in list(dropped_items):
                         if math.sqrt((pos_x - item['x'])**2 + (pos_z - item['z'])**2) < 2.0:
-                            held_item = item['type']; dropped_items.remove(item); break
+                            held_item = item['type']
+                            # Simplesmente remove o item - não spawna novo
+                            print(f"Picked item {held_item} from river")
+                            dropped_items.remove(item)
+                            break
         if glfw.get_key(window, glfw.KEY_P) == glfw.RELEASE: p_pressionado = False
 
         if glfw.get_key(window, glfw.KEY_C) == glfw.PRESS and not c_pressionado:
             c_pressionado = True
             if held_item is not None:
-                dropped_items.append({'type': held_item, 'x': pos_x, 'y': -1.8, 'z': pos_z})
-                held_item = None; checar_fabrica()
+                if held_item == CASA and not house_placed:
+                    house_x = pos_x - forward_dir[0] * 2.5
+                    house_z = pos_z - forward_dir[2] * 2.5
+                    house_yaw = yaw
+                    house_placed = True
+                    house_door_open = False
+                    house_scale = 1.2
+                    held_item = None
+                    print("Casa colocada no chão")
+                else:
+                    dropped_items.append({'type': held_item, 'x': pos_x, 'y': -1.95, 'z': pos_z})
+                    print(f"Placed item {held_item} at {pos_x:.2f},{pos_z:.2f}")
+                    held_item = None; checar_fabrica()
         if glfw.get_key(window, glfw.KEY_C) == glfw.RELEASE: c_pressionado = False
 
+        # Toggle porta da casa: F tecla
+        if glfw.get_key(window, glfw.KEY_F) == glfw.PRESS and not f_pressionado:
+            f_pressionado = True
+            if house_placed and house_scale >= 1.1:
+                door_x = house_x + math.cos(math.radians(house_yaw)) * 2.0
+                door_z = house_z + math.sin(math.radians(house_yaw)) * 2.0
+                if math.sqrt((pos_x - door_x)**2 + (pos_z - door_z)**2) < 2.0:
+                    house_door_open = not house_door_open
+                    print("Porta da casa aberta" if house_door_open else "Porta da casa fechada")
+        if glfw.get_key(window, glfw.KEY_F) == glfw.RELEASE: f_pressionado = False
+
+        # Entrar no carro: E tecla
         if glfw.get_key(window, glfw.KEY_E) == glfw.PRESS and not e_pressionado:
             e_pressionado = True
-            if car_built:
-                if not is_driving and math.sqrt((pos_x - car_x)**2 + (pos_z - car_z)**2) < 2.5:
-                    is_driving = True
-                    pos_y = 0.5
-                elif is_driving:
-                    is_driving = False
-                    pos_y = 0.0
+            if car_built and not is_driving and math.sqrt((pos_x - car_x)**2 + (pos_z - car_z)**2) < 2.5:
+                is_driving = True
+                pos_y = 0.5
+                print("Player entered the car")
         if glfw.get_key(window, glfw.KEY_E) == glfw.RELEASE: e_pressionado = False
+
+        # Sair do carro: Q tecla
+        if glfw.get_key(window, glfw.KEY_Q) == glfw.PRESS and not q_pressionado:
+            q_pressionado = True
+            if is_driving:
+                is_driving = False
+                pos_y = 0.0
+                print("Player exited the car")
+        if glfw.get_key(window, glfw.KEY_Q) == glfw.RELEASE: q_pressionado = False
 
         if glfw.get_key(window, glfw.KEY_SPACE) == glfw.PRESS:
             braco_levantado = True
@@ -359,6 +495,10 @@ def main():
             if not braco_levantado: pos_y -= 0.03
         elif pos_y < 0 and not is_driving:
             pos_y += 0.03
+
+        if house_placed and house_scale < 1.2:
+            house_scale += 0.02
+            if house_scale > 1.2: house_scale = 1.2
 
         dist_animal = math.sqrt((pos_x - (-3.0))**2 + (pos_z - (-5.0))**2)
         if dist_animal < 3.5:
@@ -418,6 +558,9 @@ def main():
         if car_built:
             glPushMatrix(); glTranslatef(car_x, -1.8, car_z); desenhar_geometria_carro(tex_corpo); glPopMatrix()
 
+        if house_placed:
+            glPushMatrix(); glTranslatef(house_x, -1.65, house_z); glRotatef(house_yaw, 0, 1, 0); glScalef(house_scale, house_scale, house_scale); desenhar_estrutura_casa(tex_corpo, house_door_open); glPopMatrix()
+
         if held_item is not None and not camera_primeira_pessoa:
             glPushMatrix(); glTranslatef(pos_x, pos_y + 1.8, pos_z); glRotatef(glfw.get_time() * 50, 0, 1, 0); renderizar_peca(held_item, tex_corpo); glPopMatrix()
 
@@ -459,6 +602,17 @@ def main():
             glMultMatrixf(matriz_sombra) # A matriz vem primeiro!
             glTranslatef(car_x, -1.8, car_z) # O posicionamento vem depois!
             desenhar_geometria_carro(0)
+            glPopMatrix()
+
+        # --- Sombra da Casa (Se colocada) ---
+        if house_placed:
+            glPushMatrix()
+            glTranslatef(0.0, 0.01, 0.0)
+            glMultMatrixf(matriz_sombra)
+            glTranslatef(house_x, -1.65, house_z)
+            glRotatef(house_yaw, 0, 1, 0)
+            glScalef(house_scale, house_scale, house_scale)
+            desenhar_estrutura_casa(0, house_door_open)
             glPopMatrix()
 
         ######################
