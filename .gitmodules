@@ -1,0 +1,6 @@
+[submodule "1Semestre/EstruturaAvancada/Trabalho-1-estruturas-de-Dados-Avancadas"]
+	path = 1Semestre/EstruturaAvancada/Trabalho-1-estruturas-de-Dados-Avancadas
+	url = https://github.com/MatheusMarquesEiras/Trabalho-1-estruturas-de-Dados-Avancadas.git
+[submodule "1Semestre/EstruturaAvancada/trabalho-2-estrutura-de-dados-avan-ada"]
+	path = 1Semestre/EstruturaAvancada/trabalho-2-estrutura-de-dados-avan-ada
+	url = https://github.com/MatheusMarquesEiras/trabalho-2-estrutura-de-dados-avan-ada.git
