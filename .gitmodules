@@ -4,3 +4,7 @@
 [submodule "1Semestre/EstruturaAvancada/trabalho-2-estrutura-de-dados-avan-ada"]
 	path = 1Semestre/EstruturaAvancada/trabalho-2-estrutura-de-dados-avan-ada
 	url = https://github.com/MatheusMarquesEiras/trabalho-2-estrutura-de-dados-avan-ada.git
+[submodule "1Semestre/GerenciamentoDeProjetos/Kanban/Sandro-Ciro-Matheus"]
+	path = 1Semestre/GerenciamentoDeProjetos/Kanban/Sandro-Ciro-Matheus
+	url = https://github.com/MatheusMarquesEiras/Sandro-Ciro-Matheus.git
+	branch = main
