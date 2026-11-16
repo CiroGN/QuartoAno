@@ -8,3 +8,6 @@
 	path = 1Semestre/GerenciamentoDeProjetos/Kanban/Sandro-Ciro-Matheus
 	url = https://github.com/MatheusMarquesEiras/Sandro-Ciro-Matheus.git
 	branch = main
+[submodule "2Semestre/MonitoriaES1"]
+	path = 2Semestre/MonitoriaES1
+	url = https://github.com/CiroGN/monitoria-es1-ifpr.git
