@@ -41,7 +41,7 @@ Projeto coordenado pela Profa. Lauriana Paludo, registrado no SUAP com o número
 - Repositório do projeto, com o material dos minicursos: [lauriana/azuredevops](https://github.com/lauriana/azuredevops)
 - Pull request com a minha inclusão na equipe e o guia do GitHub Student Developer Pack corrigido: [lauriana/azuredevops#12](https://github.com/lauriana/azuredevops/pull/12)
 - Guia corrigido, como ficou no pull request: [guia-github-student-developer-pack.md](https://github.com/CiroGN/azuredevops/blob/patch-1/guia-github-student-developer-pack.md)
-- Declaração de participação no projeto, emitida pelo SUAP: ainda não anexada aqui.
+- [Declaração de participação no projeto, emitida pelo SUAP em 17/11/2026](Declaracao_Participacao_DevOps_Azure_SUAP.pdf). Registra a participação como membro desde 06/08/2026, com 2 horas semanais e 29 horas/aula até a emissão. A autenticidade pode ser conferida em [suap.ifpr.edu.br/comum/autenticar_documento](https://suap.ifpr.edu.br/comum/autenticar_documento/) com o código verificador 978e23.
 
 ## Repositório público da monitoria
 
