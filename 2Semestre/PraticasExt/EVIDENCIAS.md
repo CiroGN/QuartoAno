@@ -11,9 +11,9 @@ Este documento junta em um lugar só as evidências da monitoria de Engenharia d
 |---|---|
 | Proposta de trabalho | [Proposta_Extensao_Monitoria_EngSoftware_I.docx](Entregas/Proposta_Extensao_Monitoria_EngSoftware_I.docx) |
 | Plano de monitoria | [Plano_de_Monitoria_Engenharia_de_Software_I.docx](Documentos/Plano_de_Monitoria_Engenharia_de_Software_I%202.docx) |
-| Relatório parcial (1º bimestre) | [Relatorio_Parcial_Monitoria_EngSoftware_I.pdf](Entregas/Relatorio_Parcial_Monitoria_EngSoftware_I.pdf) |
-| Relatório final | [Relatorio_Final_Monitoria_EngSoftware_I.pdf](Entregas/Relatorio_Final_Monitoria_EngSoftware_I.pdf) |
-| Apresentação final (17/11/2026) | [Apresentacao_Final_Praticas_Extensao_V.pdf](Entregas/Apresentacao_Final_Praticas_Extensao_V.pdf) |
+| Relatório parcial (1º bimestre) | [Relatorio_Parcial_Monitoria_EngSoftware_I.pdf](Entregas/Relatorio/Relatorio_Parcial_Monitoria_EngSoftware_I.pdf) |
+| Relatório final | [Relatorio_Final_Monitoria_EngSoftware_I.pdf](Entregas/Relatorio/Relatorio_Final_Monitoria_EngSoftware_I.pdf) |
+| Apresentação final (17/11/2026) | [Apresentacao_Final_Praticas_Extensao_V.pdf](Entregas/Apresentacao/Apresentacao_Final_Praticas_Extensao_V.pdf) |
 
 ## Declarações semanais de monitoria
 
