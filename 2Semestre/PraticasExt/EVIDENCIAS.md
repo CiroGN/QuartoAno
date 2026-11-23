@@ -17,7 +17,7 @@ Este documento junta em um lugar só as evidências da monitoria de Engenharia d
 
 ## Declarações semanais de monitoria
 
-Assinadas pela orientadora, semanas 1 a 10 (28/07 a 02/10/2026).
+Assinadas pela orientadora, semanas 1 a 16 (28/07 a 13/11/2026).
 
 | Semana | Período | Declaração |
 |---|---|---|
@@ -31,8 +31,14 @@ Assinadas pela orientadora, semanas 1 a 10 (28/07 a 02/10/2026).
 | 8 | 14/09 a 18/09 | [PDF assinado](Entregas/Declaracoes/Assinaturas/Assinadas/Declaracao_Monitoria_Semana_08_14-09_a_18-09_assinado_assinado.pdf) |
 | 9 | 21/09 a 25/09 | [PDF assinado](Entregas/Declaracoes/Assinaturas/Assinadas/Declaracao_Monitoria_Semana_09_21-09_a_25-09_assinado_assinado.pdf) |
 | 10 | 28/09 a 02/10 | [PDF assinado](Entregas/Declaracoes/Assinaturas/Assinadas/Declaracao_Monitoria_Semana_10_28-09_a_02-10_assinado_assinado.pdf) |
+| 11 | 05/10 a 09/10 | [PDF assinado](Entregas/Declaracoes/Assinaturas/Assinadas/Declaracao_Monitoria_Semana_11_05-10_a_09-10_assinado_assinado.pdf) |
+| 12 | 12/10 a 16/10 | [PDF assinado](Entregas/Declaracoes/Assinaturas/Assinadas/Declaracao_Monitoria_Semana_12_12-10_a_16-10_assinado_assinado.pdf) |
+| 13 | 19/10 a 23/10 | [PDF assinado](Entregas/Declaracoes/Assinaturas/Assinadas/Declaracao_Monitoria_Semana_13_19-10_a_23-10_assinado_assinado.pdf) |
+| 14 | 26/10 a 30/10 | [PDF assinado](Entregas/Declaracoes/Assinaturas/Assinadas/Declaracao_Monitoria_Semana_14_26-10_a_30-10_assinado_assinado.pdf) |
+| 15 | 02/11 a 06/11 | [PDF assinado](Entregas/Declaracoes/Assinaturas/Assinadas/Declaracao_Monitoria_Semana_15_02-11_a_06-11_assinado_assinado.pdf) |
+| 16 | 09/11 a 13/11 | [PDF assinado](Entregas/Declaracoes/Assinaturas/Assinadas/Declaracao_Monitoria_Semana_16_09-11_a_13-11_assinado_assinado.pdf) |
 
-As declarações das semanas 11 a 20 ainda vão ser enviadas para assinatura.
+As declarações das semanas 17 a 20 ainda vão ser enviadas para assinatura.
 
 ## Projeto de extensão DevOps Azure IFPR
 
